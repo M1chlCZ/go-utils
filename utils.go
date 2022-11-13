@@ -2,13 +2,17 @@ package utils
 
 import (
 	"bufio"
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	firebase2 "firebase.google.com/go"
+	"firebase.google.com/go/messaging"
 	"fmt"
 	_ "github.com/bitly/go-simplejson"
 	"github.com/dgrijalva/jwt-go"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
+	"google.golang.org/api/option"
 	"io"
 	"log"
 	"math"
@@ -263,4 +267,44 @@ func HashPass(password string) string {
 
 func RandInt(min int, max int) int {
 	return min + mathRand.Intn(max-min)
+}
+
+func SendMessage(token string, title string, body string, data map[string]string) {
+	opts := []option.ClientOption{option.WithCredentialsFile("xdn-project.json")}
+	c := &firebase2.Config{
+		ProjectID: "xdn-project",
+	}
+	firebase, err := firebase2.NewApp(context.Background(), c, opts...)
+	if err != nil {
+		WrapErrorLog(err.Error())
+		return
+	}
+	mess, err := firebase.Messaging(context.Background())
+	if err != nil {
+		WrapErrorLog(err.Error())
+		return
+	}
+	_, err = mess.Send(context.Background(), &messaging.Message{
+		Notification: &messaging.Notification{
+			Title: title,
+			Body:  body,
+		},
+		Android: &messaging.AndroidConfig{
+			Priority: "high",
+			Data:     data,
+			Notification: &messaging.AndroidNotification{
+				ChannelID: "xdn1",
+				Title:     title,
+				Body:      body,
+				Icon:      "@drawable/ic_notification",
+			},
+		},
+		Data:  data,
+		Token: token, // a token that you received from a client
+	})
+
+	if err != nil {
+		//WrapErrorLog(err.Error())
+		return
+	}
 }
