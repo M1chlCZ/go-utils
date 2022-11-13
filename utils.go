@@ -26,6 +26,18 @@ import (
 	"unicode"
 )
 
+var Config conf
+
+type conf struct {
+	LogFile string
+}
+
+func initConfig(fileName string) {
+	Config = conf{
+		LogFile: fileName,
+	}
+}
+
 func InlineIF(condition bool, a interface{}, b interface{}) interface{} {
 	if condition {
 		return a
@@ -97,7 +109,7 @@ func ScheduleFunc(f func(), interval time.Duration) *time.Ticker {
 }
 
 func logToFile(message string) {
-	f, err := os.OpenFile("api.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	f, err := os.OpenFile(Config.LogFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Printf("error opening file: %v\n", err)
 	}
