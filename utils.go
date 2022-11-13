@@ -32,7 +32,7 @@ type conf struct {
 	LogFile string
 }
 
-func initConfig(fileName string) {
+func InitConfig(fileName string) {
 	Config = conf{
 		LogFile: fileName,
 	}
