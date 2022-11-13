@@ -13,6 +13,7 @@ import (
 )
 
 func SendCoins(walletConfig models.Daemon, addressReceive string, addressSend string, amount float64, stakeWallet bool) (string, error) {
+
 	wallet := walletConfig
 	wrapDaemon, err := WrapDaemon(wallet, 3, "listunspent")
 	if err != nil {
